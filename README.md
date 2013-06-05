@@ -1,7 +1,7 @@
 polyclay-levelup
 ==============
 
-A redis persistence adapter for [Polyclay](https://github.com/ceejbot/polyclay).
+A LevelUP persistence adapter for [Polyclay](https://github.com/ceejbot/polyclay).
 
 [![Build Status](https://secure.travis-ci.org/ceejbot/polyclay-levelup.png)](http://travis-ci.org/ceejbot/polyclay-levelup)
 
