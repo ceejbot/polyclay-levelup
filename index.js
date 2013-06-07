@@ -6,7 +6,7 @@ var
 	assert = require('assert'),
 	async = require('async'),
 	fs = require('fs'),
-	levelup = require('levelup'),
+	levelup = require('level'),
 	path = require('path')
 	;
 
