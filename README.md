@@ -1,7 +1,7 @@
 polyclay-levelup
 ==============
 
-A LevelUP persistence adapter for [Polyclay](https://github.com/ceejbot/polyclay).
+A [LevelUP](https://github.com/rvagg/node-levelup) persistence adapter for [Polyclay](https://github.com/ceejbot/polyclay). You must specify which LevelDB implementation you'd like to use as a back end for LevelUP, such as [LevelDOWN](https://github.com/rvagg/node-leveldown/).
 
 [![Build Status](https://secure.travis-ci.org/ceejbot/polyclay-levelup.png)](http://travis-ci.org/ceejbot/polyclay-levelup)
 

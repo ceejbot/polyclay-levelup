@@ -12,7 +12,8 @@ var
 	fs             = require('fs'),
 	path           = require('path'),
 	polyclay       = require('polyclay'),
-	levelup        = require('level'),
+	levelup        = require('levelup'),
+
 	util           = require('util'),
 	LevelupAdapter = require('../index')
 	;

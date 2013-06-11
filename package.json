@@ -32,16 +32,17 @@
 	},
 	"dependencies":
 	{
-		"async":  "*",
-		"lodash": "*",
-		"level":  "*"
+		"async":   "*",
+		"lodash":  "*",
+		"levelup": "*"
 	},
 	"devDependencies":
 	{
 		"mocha":      "*",
 		"chai":       "*",
 		"blanket":    "*",
-		"travis-cov": "*"
+		"travis-cov": "*",
+		"leveldown":  "*"
 	},
 	"keywords":
 	[
