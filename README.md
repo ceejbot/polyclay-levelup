@@ -32,5 +32,5 @@ var options =
 Widget.setStorage(options, polyclay.LevelupAdapter);
 ```
 
-The Levelup object is available at `obj.adapter.db`. The attachments data store is available at `obj.adapter.attachdb`.
+The Levelup object is available at `obj.adapter.db`. The objects store is a [level-sublevel](https://github.com/dominictarr/level-sublevel) object at `obj.adapter.objects`. The attachments data store is available at `obj.adapter.attachdb`.  Sublevel is used to namespace keys so you can safely re-use a leveldb database you're using for other purposes. Note that this adapter requires json encoding.
 
