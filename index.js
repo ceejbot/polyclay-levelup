@@ -24,13 +24,22 @@ var LevelupAdapter = module.exports = function LevelupAdapter()
 
 LevelupAdapter.prototype.configure = function(opts, modelfunc)
 {
-	assert(opts.dbpath);
-	assert(typeof modelfunc === 'function');
-	if (!fs.existsSync(opts.dbpath))
-		throw(new Error(opts.dbpath + ' does not exist'));
+	assert(opts.dbpath || (opts.db && opts.attachdb ), 'you must specify either a db or a dbpath');
+	assert(typeof modelfunc === 'function', 'you must pass a polyclay model constructor function');
 
-	this.db = sublevel(levelup(opts.dbpath, {encoding: 'json'}));
-	this.attachdb = sublevel(levelup(path.join(opts.dbpath, 'attachments'), {encoding: 'binary'}));
+	if (opts.db)
+	{
+		this.db = opts.db;
+		this.attachdb = opts.attachdb;
+	}
+	else
+	{
+		if (!fs.existsSync(opts.dbpath))
+			throw(new Error(opts.dbpath + ' does not exist'));
+
+		this.db = sublevel(levelup(opts.dbpath, {encoding: 'json'}));
+		this.attachdb = sublevel(levelup(path.join(opts.dbpath, 'attachments'), {encoding: 'binary'}));
+	}
 
 	this.dbname = opts.dbname || modelfunc.prototype.plural;
 	this.objects = this.db.sublevel(this.dbname);

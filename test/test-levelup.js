@@ -13,7 +13,7 @@ var
 	path           = require('path'),
 	polyclay       = require('polyclay'),
 	levelup        = require('levelup'),
-
+	sublevel       = require('level-sublevel'),
 	util           = require('util'),
 	LevelupAdapter = require('../index')
 	;
@@ -59,7 +59,28 @@ describe('levelup adapter', function()
 			fs.mkdirSync('./test/TestDB');
 	});
 
-	it('can be configured for database access', function()
+	it('can take an existing levelup db object in its options', function(done)
+	{
+		var options =
+		{
+			db:       sublevel(levelup('./test/TestDB', {encoding: 'json'})),
+			attachdb: sublevel(levelup(path.join('./test/TestDB', 'attachments'), {encoding: 'binary'})),
+		};
+
+		var M2 = polyclay.Model.buildClass(modelDefinition);
+		polyclay.persist(M2);
+		M2.setStorage(options, LevelupAdapter);
+		M2.adapter.should.be.ok;
+		M2.adapter.db.should.be.ok;
+		M2.adapter.constructor.should.equal(M2);
+
+		M2.adapter.shutdown(function()
+		{
+			done();
+		});
+	});
+
+	it('can also take a dbpath in its options', function()
 	{
 		var options =
 		{
