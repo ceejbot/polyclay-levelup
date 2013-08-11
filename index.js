@@ -30,7 +30,7 @@ LevelupAdapter.prototype.configure = function(opts, modelfunc)
 	if (opts.db)
 	{
 		this.db = opts.db;
-		this.attachdb = opts.attachdb;
+		this._attachdb = opts.attachdb;
 	}
 	else
 	{
@@ -38,11 +38,12 @@ LevelupAdapter.prototype.configure = function(opts, modelfunc)
 			throw(new Error(opts.dbpath + ' does not exist'));
 
 		this.db = sublevel(levelup(opts.dbpath, {encoding: 'json'}));
-		this.attachdb = sublevel(levelup(path.join(opts.dbpath, 'attachments'), {encoding: 'binary'}));
+		this._attachdb = sublevel(levelup(path.join(opts.dbpath, 'attachments'), {encoding: 'binary'}));
 	}
 
 	this.dbname = opts.dbname || modelfunc.prototype.plural;
 	this.objects = this.db.sublevel(this.dbname);
+	this.attachdb = this._attachdb.sublevel(this.dbname);
 
 	this.constructor = modelfunc;
 };
@@ -58,7 +59,7 @@ LevelupAdapter.prototype.shutdown = function(callback)
 	var self = this;
 	self.db.close(function(err)
 	{
-		self.attachdb.close(callback);
+		self._attachdb.close(callback);
 	});
 };
 
