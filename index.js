@@ -121,6 +121,8 @@ LevelupAdapter.prototype.get = function(key, callback)
 
 	this.objects.get(key, function(err, payload)
 	{
+		if (err && (err.name === 'NotFoundError'))
+			return callback(null, null);
 		if (err) return callback(err);
 		var object = self.inflate(payload);
 		callback(null, object);
