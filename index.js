@@ -34,8 +34,9 @@ LevelupAdapter.prototype.configure = function(opts, modelfunc)
 	}
 	else
 	{
-		if (!fs.existsSync(opts.dbpath))
-			throw(new Error(opts.dbpath + ' does not exist'));
+		var dir = path.dirname(opts.dbpath);
+		if (!fs.existsSync(dir))
+			fs.mkdirSync(dir);
 
 		this.db = sublevel(levelup(opts.dbpath, {encoding: 'json'}));
 		this._attachdb = sublevel(levelup(path.join(opts.dbpath, 'attachments'), {encoding: 'binary'}));
