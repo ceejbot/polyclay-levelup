@@ -138,9 +138,9 @@ LevelupAdapter.prototype.getBatch = function(keylist, callback)
 
 	function continuer(err, payload)
 	{
-		if (err) return callback(err);
-
-		result.push(self.inflate(payload));
+		if (err && (err.name !== 'NotFoundError')) return callback(err);
+		if (!err)
+			result.push(self.inflate(payload));
 
 		ptr++;
 		if (ptr >= keylist.length)
