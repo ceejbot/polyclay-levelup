@@ -164,6 +164,10 @@ describe('levelup adapter', function()
 
 		db.must.have.property('find');
 		db.find.must.be.a.function();
+
+		Model.must.have.property('find');
+		Model.find.must.be.a.function();
+		Model.find.must.equal(db.find);
 	});
 
 	it('can find objects by indexed fields', function(done)

@@ -71,6 +71,8 @@ LevelupAdapter.prototype.configure = function(opts, modelfunc)
 				});
 			};
 		});
+
+		modelfunc.find = db.find;
 	}
 
 	this.constructor = modelfunc;
