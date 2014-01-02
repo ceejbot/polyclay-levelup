@@ -66,13 +66,19 @@ LevelupAdapter.prototype.configure = function(opts, modelfunc)
 				db[getter](value, function(err, struct)
 				{
 					if (err) return callback(err);
-					var result = self.inflate(struct);
-					callback(null, result);
+					callback(null, self.inflate(struct));
 				});
 			};
 		});
 
-		modelfunc.find = db.find;
+		modelfunc.find = function find(input, callback)
+		{
+			db.find(input, function(err, struct)
+			{
+				if (err) return callback(err);
+				callback(null, self.inflate(struct));
+			});
+		};
 	}
 
 	this.constructor = modelfunc;

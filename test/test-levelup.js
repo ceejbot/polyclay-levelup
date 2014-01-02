@@ -156,54 +156,6 @@ describe('levelup adapter', function()
 		});
 	});
 
-	it('decorates the object db with index functions if requested', function()
-	{
-		var db = Model.adapter.objects;
-		db.must.have.property('index');
-		db.index.must.be.a.function();
-
-		db.must.have.property('find');
-		db.find.must.be.a.function();
-
-		Model.must.have.property('find');
-		Model.find.must.be.a.function();
-		Model.find.must.equal(db.find);
-	});
-
-	it('can find objects by indexed fields', function(done)
-	{
-		var db = Model.adapter.objects;
-		db.must.have.property('byName');
-		db.byName.must.be.a.function();
-
-		db.byName('test', function(err, value)
-		{
-			demand(err).not.exist();
-			value.must.be.truthy();
-			value.must.be.an.object();
-			value.key.must.equal('1');
-
-			done();
-		});
-	});
-
-	it('adds the equivalent model-finding functions to the Model prototype', function(done)
-	{
-		Model.must.have.property('byName');
-		Model.byName.must.be.a.function();
-
-		Model.byName('test', function(err, obj)
-		{
-			demand(err).not.exist();
-			obj.must.be.truthy();
-			obj.must.be.an.object();
-			obj.must.be.instanceof(Model);
-			obj.key.must.equal('1');
-
-			done();
-		});
-	});
-
 	it('can update the document', function(done)
 	{
 		instance.name = "New name";
@@ -257,6 +209,67 @@ describe('levelup adapter', function()
 			demand(err).not.exist();
 			itemlist.must.be.an.array();
 			itemlist.length.must.equal(2);
+			done();
+		});
+	});
+
+	it('decorates the object db with index functions if requested', function()
+	{
+		var db = Model.adapter.objects;
+		db.must.have.property('index');
+		db.index.must.be.a.function();
+
+		db.must.have.property('find');
+		db.find.must.be.a.function();
+	});
+
+	it('can find objects by indexed fields', function(done)
+	{
+		var db = Model.adapter.objects;
+		db.must.have.property('byName');
+		db.byName.must.be.a.function();
+
+		db.byName('test', function(err, value)
+		{
+			demand(err).not.exist();
+			value.must.be.truthy();
+			value.must.be.an.object();
+			value.key.must.equal('1');
+
+			done();
+		});
+	});
+
+	it('adds the equivalent model-finding functions to the Model prototype', function(done)
+	{
+		Model.must.have.property('byName');
+		Model.byName.must.be.a.function();
+
+		Model.byName('test', function(err, obj)
+		{
+			demand(err).not.exist();
+			obj.must.be.truthy();
+			obj.must.be.an.object();
+			obj.must.be.instanceof(Model);
+			obj.key.must.equal('1');
+
+			done();
+		});
+	});
+
+	it('adds a find() function to the model prototype', function(done)
+	{
+		Model.must.have.property('find');
+		Model.find.must.be.a.function();
+
+		Model.find('two', function(err, obj)
+		{
+			demand(err).not.exist();
+			obj.must.be.truthy();
+			obj.must.be.an.object();
+			obj.must.be.instanceof(Model);
+			obj.key.must.equal('2');
+
 			done();
 		});
 	});

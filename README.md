@@ -3,6 +3,7 @@ polyclay-levelup
 
 A [LevelUP](https://github.com/rvagg/node-levelup) persistence adapter for [Polyclay](https://github.com/ceejbot/polyclay). You must specify which LevelDB implementation you'd like to use as a back end for LevelUP, such as [LevelDOWN](https://github.com/rvagg/node-leveldown/).
 
+[![NPM](https://nodei.co/npm/polyclay-levelup.png)](https://nodei.co/npm/polyclay-levelup/)  
 [![Build Status](https://secure.travis-ci.org/ceejbot/polyclay-levelup.png)](http://travis-ci.org/ceejbot/polyclay-levelup)
 
 ## How-to
@@ -16,13 +17,15 @@ var polyclay = require('polyclay'),
 var Widget = polyclay.Model.buildClass({
     properties:
     {
+        partnum: 'string'
         name: 'string',
-        description: 'string'
+        description: 'string',
     },
     singular: 'widget',
-    plural: 'widgets'
+    plural: 'widgets',
+    index: [ 'name' ]
 });
-polyclay.persist(Widget, 'name');
+polyclay.persist(Widget, 'partnum');
 
 var options =
 {
@@ -51,3 +54,12 @@ Widget.setStorage(options, polyclay.LevelupAdapter);
 
 If you pass in pre-constructed levelup instances, it's up to you to make sure they're
 wrapped with sublevel() and have the correct encodings.
+
+## Secondary indexes
+
+The adapter uses [level-indexing](https://github.com/stagas/level-indexing) to provide secondary indexes on fields you select. To add secondary indexes, pass an array of property names in the `index` field of the model options. The example above creates a secondary index on the `name` field of the model.
+
+`Widget.find()` is a version of the find function described in the level-indexing docs that returns a fully-constructed model instead of a json structure. Any `byFieldName()` functions are also made available on the Model constructor (aka the class); the versions on the model return fully-constructed objects.
+
+TODO: promisify these finders so you can either pass a callback or not as you prefer.
+
