@@ -1,6 +1,6 @@
 {
 	"name":           "polyclay-levelup",
-	"version":        "0.0.6",
+	"version":        "0.1.0",
 	"description":    "levelup persistence adapter for polyclay, the schema-enforcing document mapper",
 	"author":         "C J Silverio <ceejceej@gmail.com>",
 	"license":        "MIT",
@@ -15,11 +15,11 @@
 		"test":       "mocha -R spec -t 5000 test/test-*.js && mocha -t 5000 --require blanket -R travis-cov test/test-*.js",
 		"test-cov":   "mocha --require blanket -R travis-cov test/test-*.js",
 		"coverage":   "mocha --require blanket -R html-cov test/test-*.js > test/coverage.html",
-		"travis-cov": { "threshold": 90 },
-		"blanket":
-		{
-			"pattern": "//^((?!\/node_modules|test|examples\/).)*$/ig"
-		}
+		"travis-cov": { "threshold": 90 }
+	},
+	"config":
+	{
+		"blanket": { "pattern": "//^((?!\/node_modules|test|examples|polyclay\/).)*$/ig" }
 	},
 	"repository":
 	{
@@ -28,30 +28,26 @@
 	},
 	"peerDependencies":
 	{
-		"polyclay": "*"
+		"polyclay": ">= 1.6.5"
 	},
 	"dependencies":
 	{
-		"async":          "*",
-		"lodash":         "*",
-		"levelup":        "*",
-		"leveldown":      "*",
-		"level-sublevel": "*"
+		"async":          "~0.2.9",
+		"level-indexing": "~0.3.0",
+		"level-sublevel": "~5.2.0",
+		"leveldown":      "~0.10.2",
+		"levelup":        "~0.18.2",
+		"lodash":         "~2.4.1"
 	},
 	"devDependencies":
 	{
 		"mocha":      "*",
-		"chai":       "*",
+		"must":       "*",
 		"blanket":    "*",
-		"travis-cov": "*",
-		"leveldown":  "*"
+		"travis-cov": "*"
 	},
 	"keywords":
 	[
-		"odm",
-		"model",
-		"mapper",
-		"levelup",
-		"polyclay"
+		"odm", "model", "mapper", "levelup", "leveldb", "polyclay"
 	]
 }

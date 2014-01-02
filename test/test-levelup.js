@@ -1,10 +1,7 @@
 /*global describe:true, it:true, before:true, after:true */
 
 var
-	chai   = require('chai'),
-	assert = chai.assert,
-	expect = chai.expect,
-	should = chai.should()
+	demand = require('must')
 	;
 
 var
@@ -42,6 +39,7 @@ describe('levelup adapter', function()
 		required: [ 'name', 'is_valid', 'required_prop'],
 		singular: 'model',
 		plural: 'models',
+		index: [ 'name' ],
 		initialize: function()
 		{
 			this.ran_init = true;
@@ -70,9 +68,9 @@ describe('levelup adapter', function()
 		var M2 = polyclay.Model.buildClass(modelDefinition);
 		polyclay.persist(M2);
 		M2.setStorage(options, LevelupAdapter);
-		M2.adapter.should.be.ok;
-		M2.adapter.db.should.be.ok;
-		M2.adapter.constructor.should.equal(M2);
+		M2.adapter.must.be.truthy();
+		M2.adapter.db.must.be.an.object();
+		M2.adapter.constructor.must.equal(M2);
 
 		M2.adapter.shutdown(function()
 		{
@@ -89,16 +87,18 @@ describe('levelup adapter', function()
 		};
 
 		Model.setStorage(options, LevelupAdapter);
-		Model.adapter.should.be.ok;
-		Model.adapter.db.should.be.ok;
-		Model.adapter.constructor.should.equal(Model);
+		Model.adapter.must.be.an.object();
+		Model.adapter.db.must.be.an.object();
+		Model.adapter.must.have.property('objects');
+		Model.adapter.objects.must.be.an.object();
+		Model.adapter.constructor.must.equal(Model);
 	});
 
 	it('provision does nothing', function(done)
 	{
 		Model.provision(function(err)
 		{
-			should.not.exist(err);
+			demand(err).not.exist();
 			done();
 		});
 	});
@@ -112,7 +112,7 @@ describe('levelup adapter', function()
 			obj.save(function(err, reply) {});
 		};
 
-		noID.should.throw(Error);
+		noID.must.throw();
 	});
 
 	it('can save a document in the db', function(done)
@@ -133,8 +133,8 @@ describe('levelup adapter', function()
 
 		instance.save(function(err, reply)
 		{
-			should.not.exist(err);
-			reply.should.be.ok;
+			demand(err).not.exist();
+			reply.must.be.truthy();
 			done();
 		});
 	});
@@ -143,15 +143,15 @@ describe('levelup adapter', function()
 	{
 		Model.get(instance.key, function(err, retrieved)
 		{
-			should.not.exist(err);
-			retrieved.should.be.ok;
-			retrieved.should.be.an('object');
-			retrieved.key.should.equal(instance.key);
-			retrieved.name.should.equal(instance.name);
-			retrieved.created.getTime().should.equal(instance.created.getTime());
-			retrieved.is_valid.should.equal(instance.is_valid);
-			retrieved.count.should.equal(instance.count);
-			retrieved.computed.should.equal(instance.computed);
+			demand(err).not.exist();
+			retrieved.must.be.truthy();
+			retrieved.must.be.an.object();
+			retrieved.key.must.equal(instance.key);
+			retrieved.name.must.equal(instance.name);
+			retrieved.created.getTime().must.equal(instance.created.getTime());
+			retrieved.is_valid.must.equal(instance.is_valid);
+			retrieved.count.must.equal(instance.count);
+			retrieved.computed.must.equal(instance.computed);
 			done();
 		});
 	});
@@ -159,17 +159,16 @@ describe('levelup adapter', function()
 	it('can update the document', function(done)
 	{
 		instance.name = "New name";
-		instance.isDirty().should.be.true;
+		instance.isDirty().must.be.true();
 		instance.save(function(err, response)
 		{
-			should.not.exist(err);
-			response.should.be.a('string');
-			response.should.equal('OK');
-			instance.isDirty().should.equal(false);
+			demand(err).not.exist();
+			response.must.be.a.string();
+			response.must.equal('OK');
+			instance.isDirty().must.equal(false);
 			done();
 		});
 	});
-
 
 	it('can fetch in batches', function(done)
 	{
@@ -183,9 +182,9 @@ describe('levelup adapter', function()
 
 			Model.get(ids, function(err, itemlist)
 			{
-				should.not.exist(err);
-				itemlist.should.be.an('array');
-				itemlist.length.should.equal(2);
+				demand(err).not.exist();
+				itemlist.must.be.an.array();
+				itemlist.length.must.equal(2);
 				done();
 			});
 		});
@@ -196,9 +195,9 @@ describe('levelup adapter', function()
 		var ids = [ '1', '2' ];
 		Model.adapter.get(ids, function(err, itemlist)
 		{
-			should.not.exist(err);
-			itemlist.should.be.an('array');
-			itemlist.length.should.equal(2);
+			demand(err).not.exist();
+			itemlist.must.be.an.array();
+			itemlist.length.must.equal(2);
 			done();
 		});
 	});
@@ -207,9 +206,70 @@ describe('levelup adapter', function()
 	{
 		Model.all(function(err, itemlist)
 		{
-			should.not.exist(err);
-			itemlist.should.be.an('array');
-			itemlist.length.should.equal(2);
+			demand(err).not.exist();
+			itemlist.must.be.an.array();
+			itemlist.length.must.equal(2);
+			done();
+		});
+	});
+
+	it('decorates the object db with index functions if requested', function()
+	{
+		var db = Model.adapter.objects;
+		db.must.have.property('index');
+		db.index.must.be.a.function();
+
+		db.must.have.property('find');
+		db.find.must.be.a.function();
+	});
+
+	it('can find objects by indexed fields', function(done)
+	{
+		var db = Model.adapter.objects;
+		db.must.have.property('byName');
+		db.byName.must.be.a.function();
+
+		db.byName('test', function(err, value)
+		{
+			demand(err).not.exist();
+			value.must.be.truthy();
+			value.must.be.an.object();
+			value.key.must.equal('1');
+
+			done();
+		});
+	});
+
+	it('adds the equivalent model-finding functions to the Model prototype', function(done)
+	{
+		Model.must.have.property('byName');
+		Model.byName.must.be.a.function();
+
+		Model.byName('test', function(err, obj)
+		{
+			demand(err).not.exist();
+			obj.must.be.truthy();
+			obj.must.be.an.object();
+			obj.must.be.instanceof(Model);
+			obj.key.must.equal('1');
+
+			done();
+		});
+	});
+
+	it('adds a find() function to the model prototype', function(done)
+	{
+		Model.must.have.property('find');
+		Model.find.must.be.a.function();
+
+		Model.find('two', function(err, obj)
+		{
+			demand(err).not.exist();
+			obj.must.be.truthy();
+			obj.must.be.an.object();
+			obj.must.be.instanceof(Model);
+			obj.key.must.equal('2');
+
 			done();
 		});
 	});
@@ -218,9 +278,9 @@ describe('levelup adapter', function()
 	{
 		Model.constructMany([], function(err, results)
 		{
-			should.not.exist(err);
-			results.should.be.an('array');
-			results.length.should.equal(0);
+			demand(err).not.exist();
+			results.must.be.an.array();
+			results.length.must.equal(0);
 			done();
 		});
 	});
@@ -229,17 +289,17 @@ describe('levelup adapter', function()
 	{
 		Model.get('2', function(err, item)
 		{
-			should.not.exist(err);
+			demand(err).not.exist();
 
 			item.merge({ is_valid: true, count: 1023 }, function(err, response)
 			{
-				should.not.exist(err);
+				demand(err).not.exist();
 				Model.get(item.key, function(err, stored)
 				{
-					should.not.exist(err);
-					stored.count.should.equal(1023);
-					stored.is_valid.should.equal(true);
-					stored.name.should.equal(item.name);
+					demand(err).not.exist();
+					stored.count.must.equal(1023);
+					stored.is_valid.must.equal(true);
+					stored.name.must.equal(item.name);
 					done();
 				});
 			});
@@ -251,11 +311,11 @@ describe('levelup adapter', function()
 		Model.defineAttachment('frogs', 'text/plain');
 		Model.defineAttachment('avatar', 'image/png');
 
-		instance.set_frogs.should.be.a('function');
-		instance.fetch_frogs.should.be.a('function');
+		instance.set_frogs.must.be.a.function();
+		instance.fetch_frogs.must.be.a.function();
 		var property = Object.getOwnPropertyDescriptor(Model.prototype, 'frogs');
-		property.get.should.be.a('function');
-		property.set.should.be.a('function');
+		property.get.must.be.a.function();
+		property.set.must.be.a.function();
 	});
 
 	it('can save attachments', function(done)
@@ -264,8 +324,8 @@ describe('levelup adapter', function()
 		instance.frogs = 'This is bunch of frogs.';
 		instance.save(function(err, response)
 		{
-			should.not.exist(err);
-			instance.isDirty().should.equal.false;
+			demand(err).not.exist();
+			instance.isDirty().must.equal.false;
 			done();
 		});
 	});
@@ -276,14 +336,14 @@ describe('levelup adapter', function()
 		{
 			retrieved.fetch_frogs(function(err, frogs)
 			{
-				should.not.exist(err);
-				frogs.should.be.a('string');
-				frogs.should.equal('This is bunch of frogs.');
+				demand(err).not.exist();
+				frogs.must.be.a.string();
+				frogs.must.equal('This is bunch of frogs.');
 				retrieved.fetch_avatar(function(err, imagedata)
 				{
-					should.not.exist(err);
-					assert(imagedata instanceof Buffer, 'expected image attachment to be a Buffer');
-					imagedata.length.should.equal(attachmentdata.length);
+					demand(err).not.exist();
+					Buffer.isBuffer(imagedata).must.be.true();
+					imagedata.length.must.equal(attachmentdata.length);
 					done();
 				});
 			});
@@ -295,18 +355,18 @@ describe('levelup adapter', function()
 		instance.frogs = 'Poison frogs are awesome.';
 		instance.save(function(err, response)
 		{
-			should.not.exist(err);
+			demand(err).not.exist();
 			Model.get(instance.key, function(err, retrieved)
 			{
-				should.not.exist(err);
+				demand(err).not.exist();
 				retrieved.fetch_frogs(function(err, frogs)
 				{
-					should.not.exist(err);
-					frogs.should.equal(instance.frogs);
+					demand(err).not.exist();
+					frogs.must.equal(instance.frogs);
 					retrieved.fetch_avatar(function(err, imagedata)
 					{
-						should.not.exist(err);
-						imagedata.length.should.equal(attachmentdata.length);
+						demand(err).not.exist();
+						imagedata.length.must.equal(attachmentdata.length);
 						done();
 					});
 				});
@@ -319,14 +379,14 @@ describe('levelup adapter', function()
 		instance.frogs = 'Poison frogs are awesome, but I think sand frogs are adorable.';
 		instance.saveAttachment('frogs', function(err, response)
 		{
-			should.not.exist(err);
+			demand(err).not.exist();
 			Model.get(instance.key, function(err, retrieved)
 			{
-				should.not.exist(err);
+				demand(err).not.exist();
 				retrieved.fetch_frogs(function(err, frogs)
 				{
-					should.not.exist(err);
-					frogs.should.equal(instance.frogs);
+					demand(err).not.exist();
+					frogs.must.equal(instance.frogs);
 					done();
 				});
 			});
@@ -336,11 +396,11 @@ describe('levelup adapter', function()
 	it('saveAttachment() clears the dirty bit', function(done)
 	{
 		instance.frogs = 'This is bunch of frogs.';
-		instance.isDirty().should.equal(true);
+		instance.isDirty().must.equal(true);
 		instance.saveAttachment('frogs', function(err, response)
 		{
-			should.not.exist(err);
-			instance.isDirty().should.equal(false);
+			demand(err).not.exist();
+			instance.isDirty().must.equal(false);
 			done();
 		});
 	});
@@ -349,8 +409,8 @@ describe('levelup adapter', function()
 	{
 		instance.removeAttachment('frogs', function(err, deleted)
 		{
-			should.not.exist(err);
-			deleted.should.be.true;
+			demand(err).not.exist();
+			deleted.must.be.true();
 			done();
 		});
 	});
@@ -360,15 +420,15 @@ describe('levelup adapter', function()
 		instance.avatar = attachmentdata;
 		instance.save(function(err, response)
 		{
-			should.not.exist(err);
-			instance.isDirty().should.be.false;
+			demand(err).not.exist();
+			instance.isDirty().must.be.false();
 			instance.fetch_avatar(function(err, imagedata)
 			{
-				should.not.exist(err);
+				demand(err).not.exist();
 				var cached = instance.__attachments['avatar'].body;
-				cached.should.be.okay;
-				(cached instanceof Buffer).should.equal(true);
-				polyclay.dataLength(cached).should.equal(polyclay.dataLength(attachmentdata));
+				cached.must.be.truthy();
+				(cached instanceof Buffer).must.equal(true);
+				polyclay.dataLength(cached).must.equal(polyclay.dataLength(attachmentdata));
 				done();
 			});
 		});
@@ -378,9 +438,9 @@ describe('levelup adapter', function()
 	{
 		Model.adapter.attachment('1', 'avatar', function(err, body)
 		{
-			should.not.exist(err);
-			(body instanceof Buffer).should.equal(true);
-			polyclay.dataLength(body).should.equal(polyclay.dataLength(attachmentdata));
+			demand(err).not.exist();
+			(body instanceof Buffer).must.equal(true);
+			polyclay.dataLength(body).must.equal(polyclay.dataLength(attachmentdata));
 			done();
 		});
 	});
@@ -390,14 +450,14 @@ describe('levelup adapter', function()
 		instance.avatar = null;
 		instance.save(function(err, response)
 		{
-			should.not.exist(err);
+			demand(err).not.exist();
 			Model.get(instance.key, function(err, retrieved)
 			{
-				should.not.exist(err);
+				demand(err).not.exist();
 				retrieved.fetch_avatar(function(err, imagedata)
 				{
-					should.not.exist(err);
-					should.not.exist(imagedata);
+					demand(err).not.exist();
+					demand(imagedata).not.exist();
 					done();
 				});
 			});
@@ -408,9 +468,9 @@ describe('levelup adapter', function()
 	{
 		instance.destroy(function(err, deleted)
 		{
-			should.not.exist(err);
-			deleted.should.be.ok;
-			instance.destroyed.should.be.true;
+			demand(err).not.exist();
+			deleted.must.be.truthy();
+			instance.destroyed.must.be.true();
 			done();
 		});
 	});
@@ -422,16 +482,16 @@ describe('levelup adapter', function()
 		obj.avatar = attachmentdata;
 		obj.save(function(err, response)
 		{
-			should.not.exist(err);
+			demand(err).not.exist();
 			obj.destroy(function(err, deleted)
 			{
-				should.not.exist(err);
-				deleted.should.be.ok;
+				demand(err).not.exist();
+				deleted.must.be.truthy();
 
 				Model.adapter.attachment('tmp', 'avatar', function(err, payload)
 				{
-					should.not.exist(err);
-					assert.ok(payload === null, 'got an attachment payload; was not deleted');
+					demand(err).not.exist();
+					demand(payload).equal(null);
 					done();
 				});
 			});
@@ -448,14 +508,14 @@ describe('levelup adapter', function()
 		{
 			Model.get('2', function(err, obj)
 			{
-				should.not.exist(err);
-				obj.should.be.an('object');
+				demand(err).not.exist();
+				obj.must.be.an.object();
 
 				var itemlist = [obj, obj2.key];
 				Model.destroyMany(itemlist, function(err, response)
 				{
-					should.not.exist(err);
-					response.should.equal(2);
+					demand(err).not.exist();
+					response.must.equal(2);
 					done();
 				});
 			});
@@ -466,8 +526,8 @@ describe('levelup adapter', function()
 	{
 		Model.adapter.attachment('4', 'avatar', function(err, payload)
 		{
-			should.not.exist(err);
-			assert.ok(payload === null, 'got an attachment payload; was not deleted');
+			demand(err).not.exist();
+			demand(payload).be.null();
 			done();
 		});
 	});
@@ -476,7 +536,7 @@ describe('levelup adapter', function()
 	{
 		Model.destroyMany(null, function(err)
 		{
-			should.not.exist(err);
+			demand(err).not.exist();
 			done();
 		});
 	});
@@ -486,8 +546,8 @@ describe('levelup adapter', function()
 		var obj = new Model();
 		obj.destroy(function(err, destroyed)
 		{
-			err.should.be.an('object');
-			err.message.should.equal('cannot destroy object without an id');
+			err.must.be.an.object();
+			err.message.must.equal('cannot destroy object without an id');
 			done();
 		});
 	});
@@ -499,8 +559,8 @@ describe('levelup adapter', function()
 		obj.destroyed = true;
 		obj.destroy(function(err, destroyed)
 		{
-			err.should.be.an('object');
-			err.message.should.equal('object already destroyed');
+			err.must.be.an.object();
+			err.message.must.equal('object already destroyed');
 			done();
 		});
 	});
@@ -512,13 +572,13 @@ describe('levelup adapter', function()
 			name: 'this is not valid json'
 		};
 		var result = Model.adapter.inflate(bad);
-		result.name.should.equal(bad.name);
+		result.name.must.equal(bad.name);
 	});
 
 	it('inflate() does not construct an object when given a null payload', function()
 	{
 		var result = Model.adapter.inflate(null);
-		assert.equal(result, undefined, 'inflate() created a bad object!');
+		demand(result).not.exist();
 	});
 
 	after(function(done)

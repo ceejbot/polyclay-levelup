@@ -8,7 +8,8 @@ var
 	fs       = require('fs'),
 	levelup  = require('levelup'),
 	path     = require('path'),
-	sublevel = require('level-sublevel')
+	sublevel = require('level-sublevel'),
+	indexing = require('level-indexing')
 	;
 
 //-----------------------------------------------------------------
@@ -46,6 +47,40 @@ LevelupAdapter.prototype.configure = function(opts, modelfunc)
 	this.objects = this.db.sublevel(this.dbname);
 	this.attachdb = this._attachdb.sublevel(this.dbname);
 
+	if (modelfunc.prototype.__index)
+	{
+		var self = this;
+
+		var indexes = modelfunc.prototype.__index;
+		if (!Array.isArray(indexes))
+			indexes = [ indexes ];
+
+		indexing(this.objects);
+		var db = this.objects;
+		_.each(indexes, function(property)
+		{
+			db.index(property);
+			var getter = 'by' + property[0].toUpperCase() + property.substr(1);
+			modelfunc[getter] = function(value, callback)
+			{
+				db[getter](value, function(err, struct)
+				{
+					if (err) return callback(err);
+					callback(null, self.inflate(struct));
+				});
+			};
+		});
+
+		modelfunc.find = function find(input, callback)
+		{
+			db.find(input, function(err, struct)
+			{
+				if (err) return callback(err);
+				callback(null, self.inflate(struct));
+			});
+		};
+	}
+
 	this.constructor = modelfunc;
 };
 
@@ -77,6 +112,11 @@ LevelupAdapter.prototype.all = function(callback)
 	{
 		callback(err);
 	});
+};
+
+LevelupAdapter.prototype.keystream = function()
+{
+	return this.objects.createKeyStream();
 };
 
 LevelupAdapter.prototype.save = function(object, json, callback)
@@ -128,6 +168,13 @@ LevelupAdapter.prototype.get = function(key, callback)
 		var object = self.inflate(payload);
 		callback(null, object);
 	});
+};
+
+LevelupAdapter.prototype.stream = function()
+{
+	this.objects.createReadStream();
+
+
 };
 
 LevelupAdapter.prototype.getBatch = function(keylist, callback)
