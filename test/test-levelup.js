@@ -39,6 +39,7 @@ describe('levelup adapter', function()
 		required: [ 'name', 'is_valid', 'required_prop'],
 		singular: 'model',
 		plural: 'models',
+		index: [ 'name' ],
 		initialize: function()
 		{
 			this.ran_init = true;
@@ -88,6 +89,8 @@ describe('levelup adapter', function()
 		Model.setStorage(options, LevelupAdapter);
 		Model.adapter.must.be.an.object();
 		Model.adapter.db.must.be.an.object();
+		Model.adapter.must.have.property('objects');
+		Model.adapter.objects.must.be.an.object();
 		Model.adapter.constructor.must.equal(Model);
 	});
 
@@ -109,7 +112,7 @@ describe('levelup adapter', function()
 			obj.save(function(err, reply) {});
 		};
 
-		noID.must.throw()
+		noID.must.throw();
 	});
 
 	it('can save a document in the db', function(done)
@@ -153,10 +156,54 @@ describe('levelup adapter', function()
 		});
 	});
 
+	it('decorates the object db with index functions if requested', function()
+	{
+		var db = Model.adapter.objects;
+		db.must.have.property('index');
+		db.index.must.be.a.function();
+
+		db.must.have.property('find');
+		db.find.must.be.a.function();
+	});
+
+	it('can find objects by indexed fields', function(done)
+	{
+		var db = Model.adapter.objects;
+		db.must.have.property('byName');
+		db.byName.must.be.a.function();
+
+		db.byName('test', function(err, value)
+		{
+			demand(err).not.exist();
+			value.must.be.truthy();
+			value.must.be.an.object();
+			value.key.must.equal('1');
+
+			done();
+		});
+	});
+
+	it('adds the equivalent model-finding functions to the Model prototype', function(done)
+	{
+		Model.must.have.property('byName');
+		Model.byName.must.be.a.function();
+
+		Model.byName('test', function(err, obj)
+		{
+			demand(err).not.exist();
+			obj.must.be.truthy();
+			obj.must.be.an.object();
+			obj.must.be.instanceof(Model);
+			obj.key.must.equal('1');
+
+			done();
+		});
+	});
+
 	it('can update the document', function(done)
 	{
 		instance.name = "New name";
-		instance.isDirty().must.be.true()
+		instance.isDirty().must.be.true();
 		instance.save(function(err, response)
 		{
 			demand(err).not.exist();
@@ -166,7 +213,6 @@ describe('levelup adapter', function()
 			done();
 		});
 	});
-
 
 	it('can fetch in batches', function(done)
 	{
@@ -347,7 +393,7 @@ describe('levelup adapter', function()
 		instance.removeAttachment('frogs', function(err, deleted)
 		{
 			demand(err).not.exist();
-			deleted.must.be.true()
+			deleted.must.be.true();
 			done();
 		});
 	});
@@ -407,7 +453,7 @@ describe('levelup adapter', function()
 		{
 			demand(err).not.exist();
 			deleted.must.be.truthy();
-			instance.destroyed.must.be.true()
+			instance.destroyed.must.be.true();
 			done();
 		});
 	});
