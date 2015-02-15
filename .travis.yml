@@ -1,9 +1,9 @@
+sudo: false
 language: node_js
 node_js:
   - "0.8"
   - "0.10"
-install:
-  - "sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm"
-  - npm install npm
+before-install:
   - npm install polyclay
-  - "./node_modules/.bin/npm install"
+script:
+  - npm run test-travis

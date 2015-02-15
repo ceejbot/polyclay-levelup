@@ -1,17 +1,13 @@
 /*global describe:true, it:true, before:true, after:true */
 
 var
-	demand = require('must')
-	;
-
-var
-	child          = require('child_process'),
+	demand         = require('must'),
 	fs             = require('fs'),
 	path           = require('path'),
 	polyclay       = require('polyclay'),
-	levelup        = require('levelup'),
+	levelup        = require('level'),
+	rimraf         = require('rimraf'),
 	sublevel       = require('level-sublevel'),
-	util           = require('util'),
 	LevelupAdapter = require('../index')
 	;
 
@@ -52,17 +48,14 @@ describe('levelup adapter', function()
 	{
 		Model = polyclay.Model.buildClass(modelDefinition);
 		polyclay.persist(Model);
-
-		if (!fs.existsSync('./test/TestDB'))
-			fs.mkdirSync('./test/TestDB');
 	});
 
 	it('can take an existing levelup db object in its options', function(done)
 	{
 		var options =
 		{
-			db:       sublevel(levelup('./test/TestDB', {encoding: 'json'})),
-			attachdb: sublevel(levelup(path.join('./test/TestDB', 'attachments'), {encoding: 'binary'})),
+			db:       levelup('./test/TestDB', {encoding: 'json'}),
+			attachdb: levelup(path.join('./test/TestDB', 'attachments'), {encoding: 'binary'}),
 		};
 
 		var M2 = polyclay.Model.buildClass(modelDefinition);
@@ -585,11 +578,10 @@ describe('levelup adapter', function()
 	{
 		Model.adapter.shutdown(function(err)
 		{
-			child.exec('rm -rf ./test/TestDB', function(err, stdout, stderr)
+			rimraf('./test/TestD', function(err)
 			{
 				done();
 			});
 		});
 	});
-
 });

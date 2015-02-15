@@ -1,10 +1,9 @@
 polyclay-levelup
 ==============
 
-A [LevelUP](https://github.com/rvagg/node-levelup) persistence adapter for [Polyclay](https://github.com/ceejbot/polyclay). You must specify which LevelDB implementation you'd like to use as a back end for LevelUP, such as [LevelDOWN](https://github.com/rvagg/node-leveldown/).
+A [LevelUP](https://github.com/rvagg/node-levelup) persistence adapter for [Polyclay](https://github.com/ceejbot/polyclay).
 
-[![NPM](https://nodei.co/npm/polyclay-levelup.png)](https://nodei.co/npm/polyclay-levelup/)  
-[![Build Status](https://secure.travis-ci.org/ceejbot/polyclay-levelup.png)](http://travis-ci.org/ceejbot/polyclay-levelup)
+[![on npm](http://img.shields.io/npm/v/numbat-emitter.svg?style=flat)](https://www.npmjs.org/package/polyclay-levelup)  [![Tests](http://img.shields.io/travis/ceejbot/polyclay-levelup.svg?style=flat)](http://travis-ci.org/ceejbot/polyclay-levelup) ![Coverage](http://img.shields.io/badge/coverage-95%25-green.svg?style=flat) [![Dependencies](http://img.shields.io/david/ceejbot/polyclay-levelup.svg?style=flat)](https://david-dm.org/ceejbot/polyclay-levelup)
 
 ## How-to
 
@@ -62,4 +61,3 @@ The adapter uses [level-indexing](https://github.com/stagas/level-indexing) to p
 `Widget.find()` is a version of the find function described in the level-indexing docs that returns a fully-constructed model instead of a json structure. Any `byFieldName()` functions are also made available on the Model constructor (aka the class); the versions on the model return fully-constructed objects.
 
 TODO: promisify these finders so you can either pass a callback or not as you prefer.
-

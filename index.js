@@ -6,22 +6,21 @@ var
 	assert   = require('assert'),
 	async    = require('async'),
 	fs       = require('fs'),
-	levelup  = require('levelup'),
+	level    = require('level'),
 	path     = require('path'),
 	sublevel = require('level-sublevel'),
 	indexing = require('level-indexing')
 	;
 
-//-----------------------------------------------------------------
-
 var LevelupAdapter = module.exports = function LevelupAdapter()
 {
-	this.db          = null;
-	this.attachdb    = null;
-	this.dbname      = '';
-	this.objects     = null;
-	this.constructor = null;
 };
+
+LevelupAdapter.prototype.db          = null;
+LevelupAdapter.prototype.attachdb    = null;
+LevelupAdapter.prototype.dbname      = '';
+LevelupAdapter.prototype.objects     = null;
+LevelupAdapter.prototype.constructor = null;
 
 LevelupAdapter.prototype.configure = function(opts, modelfunc)
 {
@@ -39,13 +38,13 @@ LevelupAdapter.prototype.configure = function(opts, modelfunc)
 		if (!fs.existsSync(dir))
 			fs.mkdirSync(dir);
 
-		this.db = sublevel(levelup(opts.dbpath, {encoding: 'json'}));
-		this._attachdb = sublevel(levelup(path.join(opts.dbpath, 'attachments'), {encoding: 'binary'}));
+		this.db = level(opts.dbpath, {encoding: 'json'});
+		this._attachdb = level(path.join(opts.dbpath, 'attachments'), {encoding: 'binary'});
 	}
 
 	this.dbname = opts.dbname || modelfunc.prototype.plural;
-	this.objects = this.db.sublevel(this.dbname);
-	this.attachdb = this._attachdb.sublevel(this.dbname);
+	this.objects = sublevel(this.db).sublevel(this.dbname);
+	this.attachdb = sublevel(this._attachdb).sublevel(this.dbname);
 
 	if (modelfunc.prototype.__index)
 	{

@@ -1,53 +1,59 @@
 {
-	"name":           "polyclay-levelup",
-	"version":        "0.1.0",
-	"description":    "levelup persistence adapter for polyclay, the schema-enforcing document mapper",
-	"author":         "C J Silverio <ceejceej@gmail.com>",
-	"license":        "MIT",
-	"readmeFilename": "README.md",
-	"main":           "index.js",
-	"directories":
-	{
-		"test":    "test"
-	},
-	"scripts":
-	{
-		"test":       "mocha -R spec -t 5000 test/test-*.js && mocha -t 5000 --require blanket -R travis-cov test/test-*.js",
-		"test-cov":   "mocha --require blanket -R travis-cov test/test-*.js",
-		"coverage":   "mocha --require blanket -R html-cov test/test-*.js > test/coverage.html",
-		"travis-cov": { "threshold": 90 }
-	},
-	"config":
-	{
-		"blanket": { "pattern": "//^((?!\/node_modules|test|examples|polyclay\/).)*$/ig" }
-	},
-	"repository":
-	{
-		"type": "git",
-		"url":  "git://github.com/ceejbot/polyclay-levelup.git"
-	},
-	"peerDependencies":
-	{
-		"polyclay": ">= 1.6.5"
-	},
-	"dependencies":
-	{
-		"async":          "~0.2.9",
-		"level-indexing": "~0.3.0",
-		"level-sublevel": "~5.2.0",
-		"leveldown":      "~0.10.2",
-		"levelup":        "~0.18.2",
-		"lodash":         "~2.4.1"
-	},
-	"devDependencies":
-	{
-		"mocha":      "*",
-		"must":       "*",
-		"blanket":    "*",
-		"travis-cov": "*"
-	},
-	"keywords":
-	[
-		"odm", "model", "mapper", "levelup", "leveldb", "polyclay"
-	]
+  "name": "polyclay-levelup",
+  "description": "levelup persistence adapter for polyclay, the schema-enforcing document mapper",
+  "version": "0.1.0",
+  "author": "C J Silverio <ceejceej@gmail.com>",
+  "config": {
+    "blanket": {
+      "pattern": "index.js",
+      "data-cover-never": [
+        "node_modules",
+        "test",
+        "examples"
+      ],
+      "output-reporter": "spec",
+      "travis-cov": {
+        "threshold": 90
+      }
+    }
+  },
+  "dependencies": {
+    "async": "~0.9.0",
+    "level": "~0.18.0",
+    "level-indexing": "~0.3.0",
+    "level-sublevel": "~6.4.5",
+    "lodash": "~3.2.0"
+  },
+  "devDependencies": {
+    "blanket": "*",
+    "mocha": "~2.1.0",
+    "mocoverage": "~1.0.0",
+    "must": "~0.12.0",
+    "rimraf": "~2.2.8",
+    "travis-cov": "~0.2.5"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [
+    "odm",
+    "model",
+    "mapper",
+    "levelup",
+    "leveldb",
+    "polyclay"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ceejbot/polyclay-levelup.git"
+  },
+  "scripts": {
+    "coverage": "mocha --check-leaks --ui exports --require blanket -R mocoverage test/test-*.js",
+    "test": "mocha -R spec -t 5000 test/test-*.js",
+    "test-cov": "mocha --require blanket -R travis-cov test/test-*.js",
+    "test-travis": "npm test && npm run test-cov"
+  }
 }
