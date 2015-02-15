@@ -1,9 +1,8 @@
-polyclay-levelup
-==============
+# polyclay-levelup
 
 A [LevelUP](https://github.com/rvagg/node-levelup) persistence adapter for [Polyclay](https://github.com/ceejbot/polyclay).
 
-[![on npm](http://img.shields.io/npm/v/numbat-emitter.svg?style=flat)](https://www.npmjs.org/package/polyclay-levelup)  [![Tests](http://img.shields.io/travis/ceejbot/polyclay-levelup.svg?style=flat)](http://travis-ci.org/ceejbot/polyclay-levelup) ![Coverage](http://img.shields.io/badge/coverage-95%25-green.svg?style=flat) [![Dependencies](http://img.shields.io/david/ceejbot/polyclay-levelup.svg?style=flat)](https://david-dm.org/ceejbot/polyclay-levelup)
+[![on npm](http://img.shields.io/npm/v/polyclay-rethink.svg?style=flat)](https://www.npmjs.org/package/polyclay-levelup)  [![Tests](http://img.shields.io/travis/ceejbot/polyclay-levelup.svg?style=flat)](http://travis-ci.org/ceejbot/polyclay-levelup) ![Coverage](http://img.shields.io/badge/coverage-95%25-green.svg?style=flat) [![Dependencies](http://img.shields.io/david/ceejbot/polyclay-levelup.svg?style=flat)](https://david-dm.org/ceejbot/polyclay-levelup)
 
 ## How-to
 
@@ -31,7 +30,7 @@ var options =
     dbpath: '/path/to/leveldb/dir',
     dbname: 'widgets' // optional; will be inferred from plural if not
 };
-Widget.setStorage(options, polyclay.LevelupAdapter);
+Widget.setStorage(options, LevelupAdapter);
 ```
 
 The Levelup object is available at `obj.adapter.db`. The objects store is a [level-sublevel](https://github.com/dominictarr/level-sublevel) object at `obj.adapter.objects`. The attachments data store is available at `obj.adapter.attachdb`.  Sublevel is used to namespace keys so you can safely re-use a leveldb database you're using for other purposes. Note that this adapter requires json encoding.
