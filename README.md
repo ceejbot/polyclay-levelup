@@ -29,7 +29,7 @@ polyclay.persist(Widget, 'partnum');
 var options =
 {
     dbpath: '/path/to/leveldb/dir',
-    dbname: 'widgets' // optional
+    dbname: 'widgets' // optional; will be inferred from plural if not
 };
 Widget.setStorage(options, polyclay.LevelupAdapter);
 ```
