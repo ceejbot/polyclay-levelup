@@ -4,7 +4,9 @@ node_js:
   - "0.12"
   - "0.10"
   - iojs
-before-install:
+before_install:
+  - npm install -g npm@latest
+before_script:
   - npm install polyclay
 script:
   - npm run test-travis
